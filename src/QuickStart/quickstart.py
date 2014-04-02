@@ -11,17 +11,32 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
 
-#print ("Quick Start.")
-
 import socket
 import time
 
-host = socket.gethostname()
-port = 7777
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((host, port))
-#s.send('Hello, world')
-#data = s.recv(1024)
-time.sleep(5) # seconds
-s.close()
-#print 'Received', repr(data)
+def connect():
+    """connect connects the Client to the pubsubsql server.
+    address string has the form host:port."""
+    print("connect...")
+    host = socket.gethostname()
+    port = 7777
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.connect((host, port))
+    #s.send('Hello, world')
+    #data = s.recv(1024)
+    #print 'Received', repr(data)
+    return sock
+
+def disconnect(sock):
+    """disconnect disconnects the Client from the pubsubsql server."""
+    print("disconnect...")
+    sock.close()
+
+def main():
+    print("Quick Start")
+    sock = connect()
+    time.sleep(5) # seconds
+    disconnect(sock)
+    print("Done.")
+
+main()
