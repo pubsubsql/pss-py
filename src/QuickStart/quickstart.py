@@ -1,0 +1,1 @@
+print ("Quick Start.")
