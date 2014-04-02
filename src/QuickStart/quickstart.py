@@ -35,7 +35,7 @@ def connect(address):
         raise ValueError("Port is not provided")
     else:
         port = int(port)
-        if 0 == port:
+        if not port:
             raise ValueError("Invalid port")
     # connect
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
