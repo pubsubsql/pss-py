@@ -14,20 +14,20 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 import socket
 import time
 
+CONNECTION_TIMEOUT_SEC = 500.0 / 1000
+
 def disconnect(sock):
     """disconnect disconnects the Client from the pubsubsql server."""
-    print("disconnect...")
     sock.close()
 
 def connect(address):
     """connect connects the Client to the pubsubsql server.
     address string has the form host:port."""
-    print("connect...")
     #disconnect()
     # set host and port 
-    host, sep, port = address.partition(":")
+    host, separator, port = address.partition(":")
     # validate address
-    if not sep:
+    if not separator:
         raise ValueError("Invalid network address")
     elif not host:
         raise ValueError("Host is not provided")
@@ -39,16 +39,20 @@ def connect(address):
             raise ValueError("Invalid port")
     # connect
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(CONNECTION_TIMEOUT_SEC)
     sock.connect((host, port))
+    sock.settimeout(None)
     return sock
 
 def main():
     print("Quick Start")
+    print("connect...")
     sock = connect("localhost:7777")
     #sock.send('Hello, world')
     #data = sock.recv(1024)
     #print 'Received', repr(data)
     time.sleep(5) # seconds
+    print("disconnect...")
     disconnect(sock)
     print("Done.")
 
