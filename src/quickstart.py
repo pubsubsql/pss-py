@@ -10,5 +10,20 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
- 
-print ("Client.")
+
+from pubsubsql import connect, disconnect
+import time
+
+def main():
+    print("Quick Start")
+    print("connect...")
+    sock = connect("localhost:7777")
+    #sock.send('Hello, world')
+    #data = sock.recv(1024)
+    #print 'Received', repr(data)
+    time.sleep(5) # seconds
+    print("disconnect...")
+    disconnect(sock)
+    print("Done.")
+
+main()
