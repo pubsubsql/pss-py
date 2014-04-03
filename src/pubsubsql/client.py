@@ -13,35 +13,41 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  
 import socket
 
-CONNECTION_TIMEOUT_SEC = 500.0 / 1000
-
-def disconnect(sock):
-    """Disconnects the Client from the pubsubsql server.
-    """
-    sock.close()
-
-def connect(address):
-    """Connects the Client to the pubsubsql server.
+class Client:
+    """Client."""
     
-    The address string has the form host:port.
-    """
-    #disconnect()
-    # set host and port 
-    host, separator, port = address.partition(":")
-    # validate address
-    if not separator:
-        raise ValueError("Invalid network address")
-    elif not host:
-        raise ValueError("Host is not provided")
-    elif not port:
-        raise ValueError("Port is not provided")
-    else:
-        port = int(port)
-        if not port:
-            raise ValueError("Invalid port")
-    # connect
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.settimeout(CONNECTION_TIMEOUT_SEC)
-    sock.connect((host, port))
-    sock.settimeout(None)
-    return sock
+    def __init__(self):
+        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    def __CONNECTION_TIMEOUT_SEC(self):
+        return 500.0 / 1000 
+    
+    def disconnect(self):
+        """Disconnects the Client from the pubsubsql server."""
+        self.__sock.close()
+    
+    def connect(self, address):
+        """Connects the Client to the pubsubsql server.
+        
+        The address string has the form host:port.
+        """
+        #disconnect()
+        # set host and port 
+        host, separator, port = address.partition(":")
+        # validate address
+        if not separator:
+            raise ValueError("Invalid network address", address)
+        elif not host:
+            raise ValueError("Host is not provided")
+        elif not port:
+            raise ValueError("Port is not provided")
+        else:
+            try:
+                port = int(port)
+            except:
+                raise ValueError("Invalid port", port)
+        # connect
+        
+        self.__sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
+        self.__sock.connect((host, port))
+        self.__sock.settimeout(None)

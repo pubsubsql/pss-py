@@ -11,4 +11,4 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
  
-from client import connect, disconnect
+from client import Client
