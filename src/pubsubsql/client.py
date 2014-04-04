@@ -16,6 +16,12 @@ from pubsubsql.net.helper import Helper as NetHelper
 class Client:
     """Client."""
     
+    def __nvl(self, string):
+        if string:
+            return string
+        else:
+            return ""
+    
     def __reset(self):
         pass
         #response = new ResponseData();
