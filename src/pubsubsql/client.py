@@ -124,6 +124,15 @@ class Client:
             else:
                 self.__invalidRequestIdError()
 
+    def stream(self, command):
+        """Sends a command to the pubsubsql server.
+        
+        Sends a command to the pubsubsql server.
+        The pubsubsql server does not return a response to the Client.
+        """
+        self.__reset()
+        self.__write("stream " + command)
+
     def getJSON(self):
         """Returns a response string in JSON format.
         
