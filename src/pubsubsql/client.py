@@ -11,32 +11,56 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
 
-import socket
 from pubsubsql.net.helper import Helper
 
 class Client:
     """Client."""
     
+    def __reset(self):
+        pass
+        #response = new ResponseData();
+        #rawjson = null;
+        #record = -1;
+    
+    def __hard_disconnect(self):
+        #backlog.clear();
+        self.__net.close()
+        self.__reset()
+    
+    def __write(self, message):
+        try:
+            pass
+            #if (!rw.isValid()) throw new IOException("Not connected");
+            #requestId++;
+            #rw.writeWithHeader(requestId, message.getBytes(UTF8_CHARSET));
+        except:
+            self.__hard_disconnect()
+            raise
+    
     def __init__(self):
+        self.__request_id = 1
         self.__net = Helper() 
-    
-    def __CONNECTION_TIMEOUT_SEC(self):
-        return 500.0 / 1000 
-    
+        
     def is_connected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
         return self.__net.is_open()
     
     def disconnect(self):
         """Disconnects the Client from the pubsubsql server."""
-        self.__net.close()
+        #backlog.clear();
+        try:
+            if self.is_connected():
+                self.__write("close")
+        except:
+            self.__reset()
+            self.__net.close()
     
     def connect(self, address):
         """Connects the Client to the pubsubsql server.
         
         The address string has the form host:port.
         """
-        #disconnect()
+        self.disconnect()
         # set host and port 
         host, separator, port = address.partition(":")
         # validate address
@@ -52,8 +76,4 @@ class Client:
             except:
                 raise ValueError("Invalid port", port)
         # connect
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
-        sock.connect((host, port))
-        sock.settimeout(None)
-        self.__net.open(sock)
+        self.__net.open(host, port)

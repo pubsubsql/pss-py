@@ -11,7 +11,12 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
 
+import socket
+
 class Helper:
+    
+    def __CONNECTION_TIMEOUT_SEC(self):
+        return 500.0 / 1000 
     
     def __init__(self):
         self.__socket = None
@@ -22,16 +27,19 @@ class Helper:
     def is_closed(self):
         return not self.is_open()
     
-    def open(self, sock):
+    def open(self, host, port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
+        sock.connect((host, port))
+        sock.settimeout(None)
+        #
         self.__socket = sock
     
     def close(self):
-        if self.is_closed():
-            return
-        #
-        try:
-            self.__socket.close()
-        except:
-            pass
-        finally:
-            self.__socket = None
+        if self.is_open():
+            try:
+                self.__socket.close()
+            except:
+                pass
+            finally:
+                self.__socket = None
