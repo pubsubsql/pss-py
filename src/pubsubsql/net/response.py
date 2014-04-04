@@ -43,9 +43,9 @@ class Response:
     def reset(self):
         self.__parsedJson = {}
 
-    def setParsedJson(self, data):
-        if type(data) is dict:            
-            self.__parsedJson = data
+    def setParsedJson(self, parsedJson):
+        if type(parsedJson) is dict:            
+            self.__parsedJson = parsedJson
         else:
             self.reset()
     

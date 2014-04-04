@@ -18,6 +18,7 @@ def main():
     client = Client()
     client.connect("localhost:7777")
     client.execute("status")
+    print client.getJSON()
     client.disconnect()
     print("Done.")
 
