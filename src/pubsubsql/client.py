@@ -168,6 +168,10 @@ class Client:
         """
         return self.__nvl(self.__response.getPubsubid())
 
+    def getRowCount(self):
+        """Returns the number of rows in the result set returned by the pubsubsql server."""
+        return self.__nvl(self.__response.getRows())
+
     def __init__(self):
         self.__requestId = 1
         self.__rawJson = ""
