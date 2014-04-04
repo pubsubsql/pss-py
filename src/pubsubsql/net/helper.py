@@ -43,3 +43,6 @@ class Helper:
                 pass
             finally:
                 self.__socket = None
+
+    def write_with_header(self, requestId, message):
+        pass

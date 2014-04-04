@@ -29,10 +29,11 @@ class Client:
     
     def __write(self, message):
         try:
-            pass
-            #if (!rw.isValid()) throw new IOException("Not connected");
-            #requestId++;
-            #rw.writeWithHeader(requestId, message.getBytes(UTF8_CHARSET));
+            if self.__net.is_closed():
+                raise IOError("Not connected")
+            else:
+                self.__request_id += 1
+                self.__net.write_with_header(self.__request_id, message)
         except:
             self.__hard_disconnect()
             raise
