@@ -49,6 +49,16 @@ class Helper:
         self.__socket.sendall(self.__netHeader.getBytes())
         self.__socket.sendall(messageBytes)
 
+    def read(self, netHeader):
+        pass
+    
+    def readTimeout(self, socketTimeoutSec, netHeader):
+        try:
+            self.__socket.settimeout(socketTimeoutSec)
+            return self.read(netHeader)
+        except socket.timeout:
+            return None
+
     def __init__(self):
         self.__socket = None
         self.__netHeader = NetHeader()
