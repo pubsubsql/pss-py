@@ -12,6 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 from pubsubsql.net.helper import Helper as NetHelper
+from pubsubsql.net.header import Header as NetHeader
 
 class Client:
     """Client."""
@@ -37,6 +38,9 @@ class Client:
         except:
             self.__hardDisconnect()
             raise
+    
+    def __invalidRequestIdError(self):
+        raise Exception("Protocol error invalid request id")
             
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -57,6 +61,7 @@ class Client:
     def connect(self, address):
         """Connects the Client to the pubsubsql server.
         
+        Connects the Client to the pubsubsql server.
         The address string has the form host:port.
         """
         self.disconnect()
@@ -77,6 +82,24 @@ class Client:
             else:
                 self.__net.open(host, port)
 
+    def execute(self, command):
+        """Executes a command against the pubsubsql server.
+        
+        Executes a command against the pubsubsql server.
+        The pubsubsql server returns to the Client a response in JSON format.
+        """
+        self.__reset()
+        self.__write(command)
+
+    def getAction(self):
+        """Returns an action string from the response.
+        
+        Returns an action string from the response
+        returned by the last command executed against the pubsubsql server.
+        """
+        return ""
+
     def __init__(self):
         self.__requestId = 1
-        self.__net = NetHelper() 
+        self.__net = NetHelper()
+        self.__header = NetHeader()

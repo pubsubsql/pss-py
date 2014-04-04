@@ -15,6 +15,7 @@ import unittest
 from pubsubsql import Client
 
 class TestClient(unittest.TestCase):
+    """MAKE SURE TO RUN PUBSUBSQL SERVER!"""
 
     def __ADDRESS(self):
         return "localhost:7777"
@@ -45,6 +46,13 @@ class TestClient(unittest.TestCase):
         with self.assertRaises(Exception):
             client.connect("localhost:7778")
         self.assertFalse(client.isConnected())
+        client.disconnect()
+
+    def testExecuteStatus(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        client.execute("status")
+        self.assertEqual("status", client.getAction())
         client.disconnect()
 
 if __name__ == "__main__":
