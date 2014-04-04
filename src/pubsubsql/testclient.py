@@ -51,9 +51,17 @@ class TestClient(unittest.TestCase):
     def testExecuteStatus(self):
         client = Client()
         client.connect(self.__ADDRESS())
+        #
         client.execute("status")
         self.assertEqual("status", client.getAction())
         client.disconnect()
+
+    def testExecuteInvalidCommand(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        #
+        with self.assertRaises(Exception):
+            client.execute("blablabla")
 
 if __name__ == "__main__":
     unittest.main()
