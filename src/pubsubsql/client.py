@@ -76,5 +76,5 @@ class Client:
                 port = int(port)
             except:
                 raise ValueError("Invalid port", port)
-        # connect
-        self.__net.open(host, port)
+            else:
+                self.__net.open(host, port)
