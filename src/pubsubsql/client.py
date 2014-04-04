@@ -12,6 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 from pubsubsql.net.helper import Helper as NetHelper
+from pubsubsql.net.response import Response as ResponseData
 
 class Client:
     """Client."""
@@ -24,7 +25,7 @@ class Client:
     
     def __reset(self):
         self.__rawJson = ""
-        #response = new ResponseData();
+        self.__response.reset()
         #record = -1;
     
     def __hardDisconnect(self):
@@ -151,5 +152,6 @@ class Client:
 
     def __init__(self):
         self.__requestId = 1
-        self.__net = NetHelper()
         self.__rawJson = ""
+        self.__net = NetHelper()
+        self.__response = ResponseData()
