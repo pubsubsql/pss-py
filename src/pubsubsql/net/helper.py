@@ -28,12 +28,10 @@ class Helper:
         return not self.is_open()
     
     def open(self, host, port):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
-        sock.connect((host, port))
-        sock.settimeout(None)
-        #
-        self.__socket = sock
+        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__socket.settimeout(self.__CONNECTION_TIMEOUT_SEC())
+        self.__socket.connect((host, port))
+        self.__socket.settimeout(None)
     
     def close(self):
         if self.is_open():
