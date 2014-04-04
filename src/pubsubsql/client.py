@@ -11,7 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
 
-from pubsubsql.net.helper import Helper
+from pubsubsql.net.helper import Helper as NetHelper
 
 class Client:
     """Client."""
@@ -33,14 +33,14 @@ class Client:
                 raise IOError("Not connected")
             else:
                 self.__request_id += 1
-                self.__net.write_with_header(self.__request_id, message)
+                self.__net.write_with_header(self.__request_id, message.encode("utf-8"))
         except:
             self.__hard_disconnect()
             raise
     
     def __init__(self):
         self.__request_id = 1
-        self.__net = Helper() 
+        self.__net = NetHelper() 
         
     def is_connected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -53,6 +53,8 @@ class Client:
             if self.is_connected():
                 self.__write("close")
         except:
+            pass
+        finally:
             self.__reset()
             self.__net.close()
     

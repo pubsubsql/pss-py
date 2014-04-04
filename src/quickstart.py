@@ -29,6 +29,9 @@ def main():
     print("disconnect...")
     client.disconnect()
     #
+    print("disconnected.")
+    time.sleep(5) # seconds
+    #
     print("Done.")
 
 main()
