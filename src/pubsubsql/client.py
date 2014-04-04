@@ -11,6 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
 
+import json
 from pubsubsql.net.helper import Helper as NetHelper
 from pubsubsql.net.response import Response as ResponseData
 
@@ -56,10 +57,17 @@ class Client:
     def __invalidRequestIdError(self):
         raise Exception("Protocol error invalid request id")
 
+    def __setColumns(self):
+        pass
+
     def __unmarshallJson(self, messageBytes):
         self.__rawJson = messageBytes.decode("utf-8")
-        print self.__rawJson
-            
+        self.__response.setParsedJson(json.loads(self.__rawJson))
+        if self.__response.getStatus() == "ok":
+            self.__setColumns()
+        else:
+            raise ValueError(self.__response.getMsg())
+
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
         return self.__net.isOpen()
@@ -148,7 +156,7 @@ class Client:
         Returns an action string from the response
         returned by the last command executed against the pubsubsql server.
         """
-        return ""
+        return self.__nvl(self.__response.getAction())
 
     def __init__(self):
         self.__requestId = 1
