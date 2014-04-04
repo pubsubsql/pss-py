@@ -42,6 +42,16 @@ class Client:
     def __invalidRequestIdError(self):
         raise Exception("Protocol error invalid request id")
             
+    def __readTimeout(self, timeoutSec):
+        try:
+            if self.__net.isClosed():
+                raise IOError("Not connected")
+            else:
+                return self.__readTimeout(timeoutSec)
+        except:
+            self.__hardDisconnect()
+            raise
+            
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
         return self.__net.isOpen()
@@ -90,6 +100,10 @@ class Client:
         """
         self.__reset()
         self.__write(command)
+        #while True:
+            #self.__reset()
+            #messageBytes = self.__
+        
 
     def getAction(self):
         """Returns an action string from the response.

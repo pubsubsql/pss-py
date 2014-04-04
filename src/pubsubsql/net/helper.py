@@ -18,7 +18,34 @@ class Helper:
     
     def __CONNECTION_TIMEOUT_SEC(self):
         return 500.0 / 1000 
+
+    def __readSocket(self, dstBuffer, readSizeB):
+        toRead = readSizeB
+        view = memoryview(dstBuffer)
+        while toRead > 0:
+            readCount = self.__socket.recv_into(view)
+            if readCount > 0:
+                view = view[readCount:]
+                toRead -= readCount
+            else:
+                raise Exception("Failed to read socket")
+
         
+    def __readHeader(self):
+        self.__readSocket(self.__netHeader.getHeaderBuffer(),
+                          self.__netHeader.getHeaderSizeB())
+        self.__netHeader.unpackBuffer()
+    
+    def __readData(self):
+        dataSizeB = self.__netHeader.getMessageSizeB()
+        if dataSizeB < 0:
+            raise Exception("Invalid message size", dataSizeB)
+        if len(self.__dataBuffer) < dataSizeB:
+            self.__dataBuffer = bytearray(dataSizeB)
+        self.__readSocket(self.__dataBuffer, dataSizeB)
+        view = memoryview(self.__dataBuffer)
+        return view[:dataSizeB]
+                     
     def isOpen(self):
         return self.__socket
 
@@ -49,16 +76,18 @@ class Helper:
         self.__socket.sendall(self.__netHeader.getBytes())
         self.__socket.sendall(messageBytes)
 
-    def read(self, netHeader):
-        pass
+    def read(self):
+        self.__readHeader()
+        return self.__readData()
     
-    def readTimeout(self, socketTimeoutSec, netHeader):
+    def readTimeout(self, socketTimeoutSec):
         try:
             self.__socket.settimeout(socketTimeoutSec)
-            return self.read(netHeader)
+            return self.read()
         except socket.timeout:
             return None
 
     def __init__(self):
         self.__socket = None
         self.__netHeader = NetHeader()
+        self.__dataBuffer = bytearray()

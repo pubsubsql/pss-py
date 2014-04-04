@@ -23,26 +23,36 @@ class Header:
     (BIG ENDIAN)
     """
     
-    def __HEADER_SIZE_B(self):
+    def getHeaderSizeB(self):
         return 8
+
+    def getMessageSizeB(self):
+        return self.__messageSizeB 
+    
+    def getRequestId(self):
+        return self.__requestId 
+
+    def getHeaderBuffer(self):
+        return self.__buffer
+
+    def getBytes(self):
+        return self.getHeaderBuffer()
+        
+    def unpackBuffer(self):
+        self.__messageSizeB, self.__requestId = \
+            struct.unpack_from(">II", self.__buffer, 0)
+    
+    def packBuffer(self):
+        struct.pack_into(">II", self.__buffer, 0,
+                         self.__messageSizeB,
+                         self.__requestId)
     
     def setData(self, messageSizeB, requestId):
         self.__messageSizeB = messageSizeB
         self.__requestId = requestId
         #
-        struct.pack_into(">II", self.__buffer, 0,
-                         self.__messageSizeB,
-                         self.__requestId)
-
-    def getBytes(self):
-        return self.__buffer
-    
-    def readFrom(self):
-        pass
-    
-    def writeTo(self):
-        pass
+        self.packBuffer()
 
     def __init__(self, messageSizeB = 0, requestId = 0):
-        self.__buffer = bytearray(self.__HEADER_SIZE_B())
+        self.__buffer = bytearray(self.getHeaderSizeB())
         self.setData(messageSizeB, requestId)
