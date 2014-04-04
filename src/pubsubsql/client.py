@@ -10,21 +10,26 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 """
- 
+
 import socket
+from pubsubsql.net.helper import Helper
 
 class Client:
     """Client."""
     
     def __init__(self):
-        self.__sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__net = Helper() 
     
     def __CONNECTION_TIMEOUT_SEC(self):
         return 500.0 / 1000 
     
+    def is_connected(self):
+        """Returns true if the Client is currently connected to the pubsubsql server."""
+        return self.__net.is_open()
+    
     def disconnect(self):
         """Disconnects the Client from the pubsubsql server."""
-        self.__sock.close()
+        self.__net.close()
     
     def connect(self, address):
         """Connects the Client to the pubsubsql server.
@@ -47,7 +52,8 @@ class Client:
             except:
                 raise ValueError("Invalid port", port)
         # connect
-        
-        self.__sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
-        self.__sock.connect((host, port))
-        self.__sock.settimeout(None)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(self.__CONNECTION_TIMEOUT_SEC())
+        sock.connect((host, port))
+        sock.settimeout(None)
+        self.__net.open(sock)
