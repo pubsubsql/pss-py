@@ -12,7 +12,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 from pubsubsql.net.helper import Helper as NetHelper
-from pubsubsql.net.header import Header as NetHeader
 
 class Client:
     """Client."""
@@ -24,7 +23,6 @@ class Client:
         #record = -1;
     
     def __hardDisconnect(self):
-        #backlog.clear();
         self.__net.close()
         self.__reset()
     
@@ -47,10 +45,13 @@ class Client:
             if self.__net.isClosed():
                 raise IOError("Not connected")
             else:
-                return self.__readTimeout(timeoutSec)
+                return self.__net.readTimeout(timeoutSec)
         except:
             self.__hardDisconnect()
             raise
+    
+    def __unmarshallJson(self, messageBytes):
+        print messageBytes.decode("utf-8")
             
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -58,7 +59,6 @@ class Client:
     
     def disconnect(self):
         """Disconnects the Client from the pubsubsql server."""
-        #backlog.clear();
         try:
             if self.isConnected():
                 self.__write("close")
@@ -100,10 +100,23 @@ class Client:
         """
         self.__reset()
         self.__write(command)
-        #while True:
-            #self.__reset()
-            #messageBytes = self.__
-        
+        while True:
+            self.__reset()
+            messageBytes = self.__readTimeout(0)
+            if not messageBytes:
+                raise IOError("Read timed out")
+            netRequestId = self.__net.getHeader().getRequestId()
+            if netRequestId == self.__requestId:
+                # response we are waiting for
+                self.__unmarshallJson(messageBytes)
+                return
+            elif netRequestId == 0:
+                pass
+            elif netRequestId < self.__requestId:
+                # we did not read full result set from previous command ignore it
+                self.__reset()
+            else:
+                self.__invalidRequestIdError()
 
     def getAction(self):
         """Returns an action string from the response.
@@ -116,4 +129,3 @@ class Client:
     def __init__(self):
         self.__requestId = 1
         self.__net = NetHelper()
-        self.__header = NetHeader()

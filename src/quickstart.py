@@ -20,6 +20,7 @@ def main():
     #
     print("connect...")
     client.connect("localhost:7777")
+    client.execute("status")
     #
     #sock.send('Hello, world')
     #data = sock.recv(1024)

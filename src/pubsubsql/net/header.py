@@ -40,7 +40,7 @@ class Header:
         
     def unpackBuffer(self):
         self.__messageSizeB, self.__requestId = \
-            struct.unpack_from(">II", self.__buffer, 0)
+            struct.unpack_from(">II", buffer(self.__buffer), 0)
     
     def packBuffer(self):
         struct.pack_into(">II", self.__buffer, 0,

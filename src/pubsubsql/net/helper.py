@@ -44,7 +44,8 @@ class Helper:
             self.__dataBuffer = bytearray(dataSizeB)
         self.__readSocket(self.__dataBuffer, dataSizeB)
         view = memoryview(self.__dataBuffer)
-        return view[:dataSizeB]
+        view = view[:dataSizeB]
+        return view.tobytes()
                      
     def isOpen(self):
         return self.__socket
@@ -71,6 +72,9 @@ class Helper:
             finally:
                 self.__socket = None
 
+    def getHeader(self):
+        return self.__netHeader
+
     def writeWithHeader(self, requestId, messageBytes):
         self.__netHeader.setData(len(messageBytes), requestId)
         self.__socket.sendall(self.__netHeader.getBytes())
@@ -82,7 +86,10 @@ class Helper:
     
     def readTimeout(self, socketTimeoutSec):
         try:
-            self.__socket.settimeout(socketTimeoutSec)
+            if socketTimeoutSec:
+                self.__socket.settimeout(socketTimeoutSec)
+            else:
+                self.__socket.settimeout(None)
             return self.read()
         except socket.timeout:
             return None
