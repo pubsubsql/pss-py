@@ -22,35 +22,31 @@ class Client:
         #rawjson = null;
         #record = -1;
     
-    def __hard_disconnect(self):
+    def __hardDisconnect(self):
         #backlog.clear();
         self.__net.close()
         self.__reset()
     
     def __write(self, message):
         try:
-            if self.__net.is_closed():
+            if self.__net.isClosed():
                 raise IOError("Not connected")
             else:
-                self.__request_id += 1
-                self.__net.write_with_header(self.__request_id, message.encode("utf-8"))
+                self.__requestId += 1
+                self.__net.writeWithHeader(self.__requestId, message.encode("utf-8"))
         except:
-            self.__hard_disconnect()
+            self.__hardDisconnect()
             raise
-    
-    def __init__(self):
-        self.__request_id = 1
-        self.__net = NetHelper() 
-        
-    def is_connected(self):
+            
+    def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
-        return self.__net.is_open()
+        return self.__net.isOpen()
     
     def disconnect(self):
         """Disconnects the Client from the pubsubsql server."""
         #backlog.clear();
         try:
-            if self.is_connected():
+            if self.isConnected():
                 self.__write("close")
         except:
             pass
@@ -80,3 +76,7 @@ class Client:
                 raise ValueError("Invalid port", port)
             else:
                 self.__net.open(host, port)
+
+    def __init__(self):
+        self.__requestId = 1
+        self.__net = NetHelper() 

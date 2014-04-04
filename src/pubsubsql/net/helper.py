@@ -18,25 +18,25 @@ class Helper:
     
     def __CONNECTION_TIMEOUT_SEC(self):
         return 500.0 / 1000 
-    
-    def __init__(self):
-        self.__socket = None
-        self.__header = NetHeader()
-    
-    def is_open(self):
+        
+    def isOpen(self):
         return self.__socket
 
-    def is_closed(self):
-        return not self.is_open()
+    def isClosed(self):
+        return not self.isOpen()
     
     def open(self, host, port):
-        self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.__socket.settimeout(self.__CONNECTION_TIMEOUT_SEC())
-        self.__socket.connect((host, port))
-        self.__socket.settimeout(None)
+        try:
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket.settimeout(self.__CONNECTION_TIMEOUT_SEC())
+            self.__socket.connect((host, port))
+            self.__socket.settimeout(None)
+        except:
+            self.__socket = None
+            raise
     
     def close(self):
-        if self.is_open():
+        if self.isOpen():
             try:
                 self.__socket.close()
             except:
@@ -44,7 +44,11 @@ class Helper:
             finally:
                 self.__socket = None
 
-    def write_with_header(self, request_id, message_bytes):
-        self.__header.set_data(len(message_bytes), request_id)
-        self.__socket.sendall(self.__header.get_bytes())
-        self.__socket.sendall(message_bytes)
+    def writeWithHeader(self, requestId, messageBytes):
+        self.__netHeader.setData(len(messageBytes), requestId)
+        self.__socket.sendall(self.__netHeader.getBytes())
+        self.__socket.sendall(messageBytes)
+
+    def __init__(self):
+        self.__socket = None
+        self.__netHeader = NetHeader()

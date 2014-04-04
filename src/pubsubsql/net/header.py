@@ -26,20 +26,23 @@ class Header:
     def __HEADER_SIZE_B(self):
         return 8
     
-    def __init__(self):
-        self.__buffer = bytearray(self.__HEADER_SIZE_B())
-        #
-        self.__message_size = 0
-        self.__request_id = 0
-
-    def set_data(self, message_size, request_id):
-        self.__message_size = message_size
-        self.__request_id = request_id
+    def setData(self, messageSizeB, requestId):
+        self.__messageSizeB = messageSizeB
+        self.__requestId = requestId
         #
         struct.pack_into(">II", self.__buffer, 0,
-                         self.__message_size,
-                         self.__request_id)
+                         self.__messageSizeB,
+                         self.__requestId)
 
-    def get_bytes(self):
+    def getBytes(self):
         return self.__buffer
     
+    def readFrom(self):
+        pass
+    
+    def writeTo(self):
+        pass
+
+    def __init__(self, messageSizeB = 0, requestId = 0):
+        self.__buffer = bytearray(self.__HEADER_SIZE_B())
+        self.setData(messageSizeB, requestId)
