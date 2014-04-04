@@ -12,27 +12,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 from pubsubsql import Client
-import time
 
 def main():
     print("Quick Start")
     client = Client()
-    #
-    print("connect...")
     client.connect("localhost:7777")
     client.execute("status")
-    #
-    #sock.send('Hello, world')
-    #data = sock.recv(1024)
-    #print 'Received', repr(data)
-    time.sleep(5) # seconds
-    #
-    print("disconnect...")
     client.disconnect()
-    #
-    print("disconnected.")
-    time.sleep(5) # seconds
-    #
     print("Done.")
 
 main()

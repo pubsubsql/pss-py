@@ -23,9 +23,8 @@ class Client:
             return ""
     
     def __reset(self):
-        pass
+        self.__rawJson = ""
         #response = new ResponseData();
-        #rawjson = null;
         #record = -1;
     
     def __hardDisconnect(self):
@@ -42,10 +41,7 @@ class Client:
         except:
             self.__hardDisconnect()
             raise
-    
-    def __invalidRequestIdError(self):
-        raise Exception("Protocol error invalid request id")
-            
+                
     def __readTimeout(self, timeoutSec):
         try:
             if self.__net.isClosed():
@@ -55,9 +51,13 @@ class Client:
         except:
             self.__hardDisconnect()
             raise
-    
+
+    def __invalidRequestIdError(self):
+        raise Exception("Protocol error invalid request id")
+
     def __unmarshallJson(self, messageBytes):
-        print messageBytes.decode("utf-8")
+        self.__rawJson = messageBytes.decode("utf-8")
+        print self.__rawJson
             
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -124,6 +124,14 @@ class Client:
             else:
                 self.__invalidRequestIdError()
 
+    def getJSON(self):
+        """Returns a response string in JSON format.
+        
+        Returns a response string in JSON format from the 
+        last command executed against the pubsubsql server.
+        """
+        return self.__nvl(self.__rawJson)
+
     def getAction(self):
         """Returns an action string from the response.
         
@@ -135,3 +143,4 @@ class Client:
     def __init__(self):
         self.__requestId = 1
         self.__net = NetHelper()
+        self.__rawJson = ""
