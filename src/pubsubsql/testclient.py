@@ -21,7 +21,7 @@ class TestClient(unittest.TestCase):
     def __ADDRESS(self):
         return "localhost:7777"
 
-    def __TABLE_NAME(self):
+    def __generateTableName(self):
         return "T" + str(int(round(time.time() * 1000)))
 
     def setUp(self):
@@ -68,7 +68,9 @@ class TestClient(unittest.TestCase):
             client.execute("blablabla")
 
     def testInsertOneRow(self):
-        pass
+        client = Client()
+        client.connect(self.__ADDRESS())
+        #tableName = self.__generateTableName()
 
 if __name__ == "__main__":
     unittest.main()
