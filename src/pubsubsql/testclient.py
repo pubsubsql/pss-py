@@ -12,6 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 import unittest
+import time
 from pubsubsql import Client
 
 class TestClient(unittest.TestCase):
@@ -19,6 +20,9 @@ class TestClient(unittest.TestCase):
 
     def __ADDRESS(self):
         return "localhost:7777"
+
+    def __TABLE_NAME(self):
+        return "T" + str(int(round(time.time() * 1000)))
 
     def setUp(self):
         pass
@@ -62,6 +66,9 @@ class TestClient(unittest.TestCase):
         #
         with self.assertRaises(Exception):
             client.execute("blablabla")
+
+    def testInsertOneRow(self):
+        pass
 
 if __name__ == "__main__":
     unittest.main()
