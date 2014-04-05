@@ -27,7 +27,7 @@ class Client:
     def __reset(self):
         self.__rawJson = ""
         self.__response.reset()
-        #record = -1;
+        self.__record = -1
     
     def __hardDisconnect(self):
         self.__net.close()
@@ -172,8 +172,43 @@ class Client:
         """Returns the number of rows in the result set returned by the pubsubsql server."""
         return self.__nvl(self.__response.getRows())
 
+    def nextRow(self):
+        """Move to the next row in the result set returned by the pubsubsql server.
+        
+        Move to the next row in the result set returned by the pubsubsql server.
+        When called for the first time, NextRow moves to the first row in the result set.
+        Returns false when all rows are read.
+        """
+        while True:
+            # no result set
+            if not self.__response.getRows():
+                return False
+            if not self.__response.getFromrow():
+                return False
+            if not self.__response.getTorow():
+                return False
+            # the current record is valid
+            self.__record += 1
+            delta = self.__response.getTorow() - self.__response.getFromrow()
+            if self.__record <= delta:
+                return True
+            # we reached the end of the result set?
+            if self.__response.getRows() == self.__response.getTorow():
+                self.__record -= 1
+                return False
+            # there is another batch of data
+            self.__reset()
+            messageBytes = self.__readTimeout(0)
+            if not messageBytes:
+                raise IOError("Read timed out")
+            netRequestId = self.__net.getHeader().getRequestId()
+            if netRequestId != self.__requestId:
+                self.__invalidRequestIdError()
+            self.__unmarshallJson(messageBytes)
+
     def __init__(self):
         self.__requestId = 1
+        self.__record = -1
         self.__rawJson = ""
         self.__net = NetHelper()
         self.__response = ResponseData()

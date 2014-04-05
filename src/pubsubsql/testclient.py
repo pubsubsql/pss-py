@@ -70,7 +70,15 @@ class TestClient(unittest.TestCase):
     def testInsertOneRow(self):
         client = Client()
         client.connect(self.__ADDRESS())
-        #tableName = self.__generateTableName()
+        tableName = self.__generateTableName()
+        command = "insert into {} (col1, col2, col3) values (1:col1, 1:col2, 1:col3) returning *".format(tableName)
+        client.execute(command)
+        self.assertEqual("insert", client.getAction())
+        self.assertEqual(1, client.getRowCount())
+        self.assertTrue(client.nextRow())
+        #
+        self.assertFalse(client.nextRow())
+        client.disconnect()
 
 if __name__ == "__main__":
     unittest.main()
