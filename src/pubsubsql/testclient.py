@@ -34,6 +34,14 @@ class TestClient(unittest.TestCase):
         client.execute(command)
         client.disconnect()
 
+    def __insertRows(self, tableName):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        for row in range(self.__ROWS()):
+            command = "insert into {} (col1, col2, col3) values ({}:col1, {}:col2, {}:col3)".format(tableName, row, row, row)
+            client.execute(command)
+        client.disconnect()
+
     def setUp(self):
         pass
 
@@ -144,6 +152,31 @@ class TestClient(unittest.TestCase):
         self.assertTrue(client.hasColumn("col2"))
         self.assertTrue(client.hasColumn("col3"))
         self.assertEqual(4, client.getColumnCount()) # including id
+        #
+        self.assertFalse(client.nextRow())
+        client.disconnect()
+
+    def testSelectManyRows(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        #
+        client = Client()
+        client.connect(self.__ADDRESS())
+        # select one row
+        command = "select * from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual("select", client.getAction())
+        self.assertEqual(self.__ROWS(), client.getRowCount())
+        for row in range(self.__ROWS()):
+            self.assertTrue(client.nextRow())
+            self.assertNotEqual("", client.getValue("id"))
+            self.assertEqual("{}:col1".format(row), client.getValue("col1"))
+            self.assertEqual("{}:col2".format(row), client.getValue("col2"))
+            self.assertEqual("{}:col3".format(row), client.getValue("col3"))
+            self.assertTrue(client.hasColumn("col1"))
+            self.assertTrue(client.hasColumn("col2"))
+            self.assertTrue(client.hasColumn("col3"))
+            self.assertEqual(4, client.getColumnCount()) # including id
         #
         self.assertFalse(client.nextRow())
         client.disconnect()
