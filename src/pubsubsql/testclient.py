@@ -21,6 +21,9 @@ class TestClient(unittest.TestCase):
     def __ADDRESS(self):
         return "localhost:7777"
 
+    def __ROWS(self):
+        return 3
+
     def __generateTableName(self):
         return "T" + str(int(round(time.time() * 1000)))
 
@@ -72,16 +75,45 @@ class TestClient(unittest.TestCase):
         client.connect(self.__ADDRESS())
         tableName = self.__generateTableName()
         command = "insert into {} (col1, col2, col3) values (1:col1, 1:col2, 1:col3) returning *".format(tableName)
+        #
         client.execute(command)
         self.assertEqual("insert", client.getAction())
         self.assertEqual(1, client.getRowCount())
         self.assertTrue(client.nextRow())
+        #
         self.assertNotEqual("", client.getValue("id"))
         self.assertEqual("1:col1", client.getValue("col1"))
         self.assertEqual("1:col2", client.getValue("col2"))
         self.assertEqual("1:col3", client.getValue("col3"))
-        self.assertEqual(4, client.getColumnCount())
+        self.assertTrue(client.hasColumn("col1"))
+        self.assertTrue(client.hasColumn("col2"))
+        self.assertTrue(client.hasColumn("col3"))
+        self.assertEqual(4, client.getColumnCount()) # including id
+        #
         self.assertFalse(client.nextRow())
+        client.disconnect()
+
+    def testInsertManyRow(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        tableName = self.__generateTableName()
+        command = "insert into {} (col1, col2, col3) values (1:col1, 1:col2, 1:col3) returning *".format(tableName)
+        for _ in range(self.__ROWS()):
+            client.execute(command)
+            self.assertEqual("insert", client.getAction())
+            self.assertEqual(1, client.getRowCount())
+            self.assertTrue(client.nextRow())
+            #
+            self.assertNotEqual("", client.getValue("id"))
+            self.assertEqual("1:col1", client.getValue("col1"))
+            self.assertEqual("1:col2", client.getValue("col2"))
+            self.assertEqual("1:col3", client.getValue("col3"))
+            self.assertTrue(client.hasColumn("col1"))
+            self.assertTrue(client.hasColumn("col2"))
+            self.assertTrue(client.hasColumn("col3"))
+            self.assertEqual(4, client.getColumnCount()) # including id
+            #
+            self.assertFalse(client.nextRow())
         client.disconnect()
 
 if __name__ == "__main__":
