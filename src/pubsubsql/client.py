@@ -251,6 +251,14 @@ class Client:
         else:
             return 0
 
+    def getColumns(self):
+        """Returns the column names in the columns collection of the result set."""
+        columns = self.__response.getColumns()
+        if columns:
+            return columns
+        else:
+            return []
+
     def __init__(self):
         self.__requestId = 1
         self.__record = -1
