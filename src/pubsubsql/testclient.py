@@ -27,6 +27,13 @@ class TestClient(unittest.TestCase):
     def __generateTableName(self):
         return "T" + str(int(round(time.time() * 1000)))
 
+    def __insertRow(self, tableName):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "insert into {} (col1, col2, col3) values (1:col1, 1:col2, 1:col3)".format(tableName)
+        client.execute(command)
+        client.disconnect()
+
     def setUp(self):
         pass
 
@@ -114,6 +121,31 @@ class TestClient(unittest.TestCase):
             self.assertEqual(4, client.getColumnCount()) # including id
             #
             self.assertFalse(client.nextRow())
+        client.disconnect()
+
+    def testSelectOneRow(self):
+        tableName = self.__generateTableName()
+        self.__insertRow(tableName)
+        #
+        client = Client()
+        client.connect(self.__ADDRESS())
+        # select one row
+        command = "select * from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual("select", client.getAction())
+        self.assertEqual(1, client.getRowCount())
+        self.assertTrue(client.nextRow())
+        #
+        self.assertNotEqual("", client.getValue("id"))
+        self.assertEqual("1:col1", client.getValue("col1"))
+        self.assertEqual("1:col2", client.getValue("col2"))
+        self.assertEqual("1:col3", client.getValue("col3"))
+        self.assertTrue(client.hasColumn("col1"))
+        self.assertTrue(client.hasColumn("col2"))
+        self.assertTrue(client.hasColumn("col3"))
+        self.assertEqual(4, client.getColumnCount()) # including id
+        #
+        self.assertFalse(client.nextRow())
         client.disconnect()
 
 if __name__ == "__main__":
