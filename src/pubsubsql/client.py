@@ -243,6 +243,14 @@ class Client:
         else:
             return True
 
+    def getColumnCount(self):
+        """Returns the number of columns in the columns collection of the result set."""
+        columns = self.__response.getColumns()
+        if columns:
+            return len(columns)
+        else:
+            return 0
+
     def __init__(self):
         self.__requestId = 1
         self.__record = -1
