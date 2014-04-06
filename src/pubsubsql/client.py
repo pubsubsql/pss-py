@@ -72,8 +72,8 @@ class Client:
         else:
             raise ValueError(self.__response.getMsg())
 
-    def __getColumn(self, column):
-        pass
+    def __getColumnIndex(self, column):
+        return self.__columns.get(column, -1)
 
     def __getValueByColumnName(self, column):
         print self.__response.getData()
