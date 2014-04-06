@@ -236,6 +236,13 @@ class Client:
                 self.__invalidRequestIdError()
             self.__unmarshallJson(messageBytes)
 
+    def hasColumn(self, column):
+        """Determines if the column name exists in the columns collection of the result set."""
+        if self.__getColumnIndex(column) < 0:
+            return False
+        else:
+            return True
+
     def __init__(self):
         self.__requestId = 1
         self.__record = -1
