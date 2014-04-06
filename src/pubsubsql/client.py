@@ -76,27 +76,30 @@ class Client:
         return self.__columns.get(column, -1)
 
     def __getValueByColumnName(self, column):
-        print self.__response.getData()
-        print self.__response.getColumns()
-        return ""
+        data = self.__response.getData()
+        if not data:
+            return ""
+        if len(data) <= self.__record:
+            return ""
+        ordinal = self.__getColumnIndex(column)
+        if ordinal < 0:
+            return ""
+        return data[self.__record][ordinal]
 
     def __getValueByColumnOrdinal(self, ordinal):
-        print self.__response.getData()
-        print self.__response.getColumns()
-        return ""
-
-    def getValue(self, column):
-        """Returns the value within the current row for the given column name or column ordinal.
-        
-        If the column name does not exist, Value returns an empty string.
-        The column ordinal represents the zero based position of the column in the Columns collection of the result set.
-        If the column ordinal is out of range, getValue returns an empty string.
-        """
-        print "len: " + str(len(self.__response.getData()))
-        if isinstance(column, basestring):
-            return self.__getValueByColumnName(column)
-        else:
-            return self.__getValueByColumnOrdinal(column)
+        if ordinal < 0:
+            return ""
+        data = self.__response.getData()
+        if not data:
+            return ""
+        if len(data) <= self.__record:
+            return ""
+        columns = self.__response.getColumns()
+        if not columns:
+            return ""
+        if ordinal >= len(columns):
+            return ""
+        return data[self.__record][ordinal]
 
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -235,6 +238,18 @@ class Client:
             if netRequestId != self.__requestId:
                 self.__invalidRequestIdError()
             self.__unmarshallJson(messageBytes)
+
+    def getValue(self, column):
+        """Returns the value within the current row for the given column name or column ordinal.
+        
+        If the column name does not exist, Value returns an empty string.
+        The column ordinal represents the zero based position of the column in the Columns collection of the result set.
+        If the column ordinal is out of range, getValue returns an empty string.
+        """
+        if isinstance(column, basestring):
+            return self.__getValueByColumnName(column)
+        else:
+            return self.__getValueByColumnOrdinal(column)
 
     def hasColumn(self, column):
         """Determines if the column name exists in the columns collection of the result set."""
