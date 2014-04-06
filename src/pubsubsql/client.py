@@ -58,7 +58,11 @@ class Client:
         raise Exception("Protocol error invalid request id")
 
     def __setColumns(self):
-        pass
+        self.__columns.clear()
+        columns = self.__response.getColumns()
+        if columns:
+            for index, column in enumerate(columns):
+                self.__columns[column] = index
 
     def __unmarshallJson(self, messageBytes):
         self.__rawJson = messageBytes.decode("utf-8")
@@ -67,6 +71,32 @@ class Client:
             self.__setColumns()
         else:
             raise ValueError(self.__response.getMsg())
+
+    def __getColumn(self, column):
+        pass
+
+    def __getValueByColumnName(self, column):
+        print self.__response.getData()
+        print self.__response.getColumns()
+        return ""
+
+    def __getValueByColumnOrdinal(self, ordinal):
+        print self.__response.getData()
+        print self.__response.getColumns()
+        return ""
+
+    def getValue(self, column):
+        """Returns the value within the current row for the given column name or column ordinal.
+        
+        If the column name does not exist, Value returns an empty string.
+        The column ordinal represents the zero based position of the column in the Columns collection of the result set.
+        If the column ordinal is out of range, getValue returns an empty string.
+        """
+        print "len: " + str(len(self.__response.getData()))
+        if isinstance(column, basestring):
+            return self.__getValueByColumnName(column)
+        else:
+            return self.__getValueByColumnOrdinal(column)
 
     def isConnected(self):
         """Returns true if the Client is currently connected to the pubsubsql server."""
@@ -212,3 +242,4 @@ class Client:
         self.__rawJson = ""
         self.__net = NetHelper()
         self.__response = ResponseData()
+        self.__columns = {}

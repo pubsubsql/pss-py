@@ -76,6 +76,7 @@ class TestClient(unittest.TestCase):
         self.assertEqual("insert", client.getAction())
         self.assertEqual(1, client.getRowCount())
         self.assertTrue(client.nextRow())
+        #self.assertNotEqual("", client.getValue("id"))
         #
         self.assertFalse(client.nextRow())
         client.disconnect()
