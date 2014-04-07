@@ -217,5 +217,17 @@ class TestClient(unittest.TestCase):
         self.assertEqual(1, client.getRowCount())
         client.disconnect()
     
+    def testDeleteManyRow(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        #
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "delete from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual("delete", client.getAction())
+        self.assertEqual(self.__ROWS(), client.getRowCount())
+        client.disconnect()
+    
 if __name__ == "__main__":
     unittest.main()
