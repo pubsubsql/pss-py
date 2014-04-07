@@ -240,5 +240,16 @@ class TestClient(unittest.TestCase):
         self.assertEqual("key", client.getAction())
         client.disconnect()
     
+    def testTag(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        #
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "tag {} col1".format(tableName)
+        client.execute(command)
+        self.assertEqual("tag", client.getAction())
+        client.disconnect()
+    
 if __name__ == "__main__":
     unittest.main()
