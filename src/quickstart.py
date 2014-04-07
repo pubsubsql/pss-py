@@ -96,7 +96,7 @@ class QuickStart:
         client.execute("select id, Ticker from Stocks")
         while client.nextRow():
             print "*********************************"
-            print "id:{} Ticker:{} \n".format(client.getValue("id"), client.getValue("Ticker"))
+            print "id:{} Ticker:{}".format(client.getValue("id"), client.getValue("Ticker"))
         
         """
         //----------------------------------------------------------------------------------------------------
@@ -107,10 +107,10 @@ class QuickStart:
         timeout = 100
         while subscriber.waitForPubSub(timeout):
             print "*********************************"
-            print "Action:", subscriber.getAction()
+            print "Action:{}".format(subscriber.getAction())
             while subscriber.nextRow():
-                print "New MEGA CAP stock:", subscriber.getValue("Ticker")
-                print "Price:", subscriber.getValue("Price")
+                print "New MEGA CAP stock:{}".format(subscriber.getValue("Ticker"))
+                print "Price:{}".format(subscriber.getValue("Price"))
         
         """
         //----------------------------------------------------------------------------------------------------
@@ -160,10 +160,11 @@ class QuickStart:
         
         while subscriber.waitForPubSub(timeout):
             print "*********************************"
-            print "Action:", subscriber.getAction()
+            print "Action:{}".format(subscriber.getAction())
             while subscriber.nextRow():
                 for ordinal, column in enumerate(subscriber.getColumns()):
-                    print "{}:{}".format(column, subscriber.getValue(ordinal))
+                    print "{}:{}".format(column, subscriber.getValue(ordinal)),
+                print ""
                     
         
         """
