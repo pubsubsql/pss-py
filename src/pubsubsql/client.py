@@ -12,6 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 """
 
 import json
+import collections
 from pubsubsql.net.helper import Helper as NetHelper
 from pubsubsql.net.response import Response as ResponseData
 
@@ -30,6 +31,7 @@ class Client:
         self.__record = -1
     
     def __hardDisconnect(self):
+        self.__backlog.clear()
         self.__net.close()
         self.__reset()
     
@@ -44,12 +46,12 @@ class Client:
             self.__hardDisconnect()
             raise
                 
-    def __readTimeout(self, timeoutSec):
+    def __readTimeout(self, timeoutMs):
         try:
             if self.__net.isClosed():
                 raise IOError("Not connected")
             else:
-                return self.__net.readTimeout(timeoutSec)
+                return self.__net.readTimeout(float(timeoutMs) / 1000)
         except:
             self.__hardDisconnect()
             raise
@@ -107,6 +109,7 @@ class Client:
     
     def disconnect(self):
         """Disconnects the Client from the pubsubsql server."""
+        self.__backlog.clear()
         try:
             if self.isConnected():
                 self.__write("close")
@@ -159,7 +162,7 @@ class Client:
                 self.__unmarshallJson(messageBytes)
                 return
             elif netRequestId == 0:
-                pass
+                self.__backlog.append(messageBytes)
             elif netRequestId < self.__requestId:
                 # we did not read full result set from previous command ignore it
                 self.__reset()
@@ -274,6 +277,32 @@ class Client:
         else:
             return []
 
+    def waitForPubSub(self, timeoutMs):
+        """Waits until the pubsubsql server publishes a message.
+        
+        Waits until the pubsubsql server publishes a message for
+        the subscribed Client or until the timeout interval elapses.
+        Returns false when timeout interval elapses.
+        """
+        if timeoutMs <= 0:
+            return False
+        self.__reset()
+        # process backlog first
+        if len(self.__backlog):
+            messageBytes = self.__backlog.popleft()
+            self.__unmarshallJson(messageBytes)
+            return True
+        while True:
+            messageBytes = self.__readTimeout(timeoutMs)
+            if not messageBytes:
+                return False
+            netRequestId = self.__net.getHeader().getRequestId()
+            if not netRequestId:
+                self.__unmarshallJson(messageBytes)
+                return True  
+            # this is not pubsub message; are we reading abandoned result set?
+            # ignore and continue
+
     def __init__(self):
         self.__requestId = 1
         self.__record = -1
@@ -281,3 +310,4 @@ class Client:
         self.__net = NetHelper()
         self.__response = ResponseData()
         self.__columns = {}
+        self.__backlog = collections.deque()

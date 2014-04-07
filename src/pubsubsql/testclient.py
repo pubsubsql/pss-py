@@ -24,6 +24,10 @@ class TestClient(unittest.TestCase):
     def __ROWS(self):
         return 3
 
+    def __COLUMNS(self):
+        # including id
+        return 4
+
     def __generateTableName(self):
         return "T" + str(int(round(time.time() * 1000)))
 
@@ -41,6 +45,18 @@ class TestClient(unittest.TestCase):
             command = "insert into {} (col1, col2, col3) values ({}:col1, {}:col2, {}:col3)".format(tableName, row, row, row)
             client.execute(command)
         client.disconnect()
+
+    def __checkPubsubResultSet(self, client, pubsubId, action, rows, columns):
+        readRows = 0
+        while readRows < rows:
+            self.assertTrue(client.waitForPubSub(100), "expected {} rows but got {}".format(rows, readRows))
+            self.assertNotEqual("", client.getPubSubId())
+            self.assertEqual(action, client.getAction())
+            while client.nextRow():
+                readRows += 1
+                self.assertEqual(client.getColumnCount(), columns)
+                for col in range(columns):
+                    self.assertTrue(client.getValue(col))
 
     def setUp(self):
         pass
@@ -251,5 +267,135 @@ class TestClient(unittest.TestCase):
         self.assertEqual("tag", client.getAction())
         client.disconnect()
     
+    def testSubscribeUnsubscribe(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        tableName = self.__generateTableName()
+        command = "subscribe * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # unsubscribe
+        command = "unsubscribe from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual("unsubscribe", client.getAction())
+        #
+        client.disconnect()
+    
+    def testSubscribeUnsubscribeByPubSubId(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        tableName = self.__generateTableName()
+        command = "subscribe * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # unsubscribe
+        command = "unsubscribe from {} where pubsubid = {}".format(tableName, client.getPubSubId())
+        client.execute(command)
+        self.assertEqual("unsubscribe", client.getAction())
+        #
+        client.disconnect()
+    
+    def testPubSubTimeout(self):
+        client = Client()
+        client.connect(self.__ADDRESS())
+        self.assertFalse(client.waitForPubSub(10))
+    
+    def testSubscribeSkip(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "subscribe skip * from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertFalse(client.waitForPubSub(10))
+        client.disconnect()
+    
+    def testPubSubAddOnSubscribe(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "subscribe * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # pubsub add
+        pubsubId = client.getPubSubId()
+        self.__checkPubsubResultSet(client, pubsubId, "add", self.__ROWS(), self.__COLUMNS())
+        client.disconnect()
+
+    def testPubSubInsert(self):
+        tableName = self.__generateTableName()
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "subscribe * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # generate insert event
+        self.__insertRows(tableName)
+        # pubsub insert
+        self.__checkPubsubResultSet(client, client.getPubSubId, "insert", self.__ROWS(), self.__COLUMNS())
+        client.disconnect()
+    
+    def testPubSubUpdate(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "subscribe skip * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # generate update event
+        command = "update {} set col1 = newvalue".format(tableName)
+        client.execute(command)
+        self.assertEqual(self.__ROWS(), client.getRowCount())
+        # expected id and updated column (col1)
+        self.__checkPubsubResultSet(client, client.getPubSubId, "update", self.__ROWS(), 2)
+        client.disconnect()
+
+    def testPubSubDelete(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "subscribe skip * from {}".format(tableName)
+        # subscribe
+        client.execute(command)
+        self.assertEqual("subscribe", client.getAction())
+        self.assertNotEqual("", client.getPubSubId())
+        # generate insert event
+        command = "delete from {}".format(tableName)
+        client.execute(command)
+        self.assertEqual(self.__ROWS(), client.getRowCount())
+        # expected id and updated column (col1)
+        self.__checkPubsubResultSet(client, client.getPubSubId, "delete", self.__ROWS(), self.__COLUMNS())
+        client.disconnect()
+        
+    def testPubSubRemove(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        client = Client()
+        client.connect(self.__ADDRESS())
+        # key col1
+        command = "key {} col1".format(tableName)
+        client.execute(command)
+        command = "subscribe skip * from {} where col1 = 1:col1".format(tableName)
+        client.execute(command)
+        # generate remove
+        command = "update {} set col1 = newvalue where col1 = 1:col1".format(tableName)
+        client.execute(command)
+        self.__checkPubsubResultSet(client, client.getPubSubId, "remove", 1, self.__COLUMNS())
+        client.disconnect()
+        
 if __name__ == "__main__":
     unittest.main()
