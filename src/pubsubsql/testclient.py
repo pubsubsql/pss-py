@@ -229,5 +229,16 @@ class TestClient(unittest.TestCase):
         self.assertEqual(self.__ROWS(), client.getRowCount())
         client.disconnect()
     
+    def testKey(self):
+        tableName = self.__generateTableName()
+        self.__insertRows(tableName)
+        #
+        client = Client()
+        client.connect(self.__ADDRESS())
+        command = "key {} col1".format(tableName)
+        client.execute(command)
+        self.assertEqual("key", client.getAction())
+        client.disconnect()
+    
 if __name__ == "__main__":
     unittest.main()

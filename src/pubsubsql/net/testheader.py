@@ -14,7 +14,13 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 import unittest
 from header import Header as NetHeader
 
-class Test(unittest.TestCase):
+class TestHeader(unittest.TestCase):
+         
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
          
     def testGetBytes(self):
         header1 = NetHeader(32567, 9875235)
