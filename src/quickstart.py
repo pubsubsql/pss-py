@@ -17,7 +17,6 @@ class QuickStart:
     """MAKE SURE TO RUN PUBSUBSQL SERVER WHEN RUNNING THE EXAMPLE"""
     
     def quickStart(self):
-        print("Quick Start")
         client = Client()
         subscriber = Client()
         
@@ -181,9 +180,8 @@ class QuickStart:
         //----------------------------------------------------------------------------------------------------
         """
         
-        subscriber.disconnect();
-        client.disconnect();
-        print("Done.")
+        client.disconnect()
+        subscriber.disconnect()
 
 if __name__ == "__main__":
     QuickStart().quickStart()

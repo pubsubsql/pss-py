@@ -114,11 +114,10 @@ class Client:
             if self.isConnected():
                 self.__write("close")
         except:
-            pass
-        finally:
-            self.__reset()
-            self.__net.close()
-    
+            pass        
+        self.__reset()
+        self.__net.close()
+
     def connect(self, address):
         """Connects the Client to the pubsubsql server.
         
@@ -161,7 +160,7 @@ class Client:
                 # response we are waiting for
                 self.__unmarshallJson(messageBytes)
                 return
-            elif netRequestId == 0:
+            elif not netRequestId:
                 self.__backlog.append(messageBytes)
             elif netRequestId < self.__requestId:
                 # we did not read full result set from previous command ignore it

@@ -20,8 +20,8 @@ class Helper:
         return 500.0 / 1000 
 
     def __readSocket(self, dstBuffer, readSizeB):
+        view = memoryview(dstBuffer)[:readSizeB]
         toRead = readSizeB
-        view = memoryview(dstBuffer)
         while toRead > 0:
             readCount = self.__socket.recv_into(view)
             if readCount > 0:
@@ -43,8 +43,7 @@ class Helper:
         if len(self.__dataBuffer) < dataSizeB:
             self.__dataBuffer = bytearray(dataSizeB)
         self.__readSocket(self.__dataBuffer, dataSizeB)
-        view = memoryview(self.__dataBuffer)
-        view = view[:dataSizeB]
+        view = memoryview(self.__dataBuffer)[:dataSizeB]
         return view.tobytes()
                      
     def isOpen(self):
