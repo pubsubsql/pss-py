@@ -1,10 +1,12 @@
-python
+pss-py
 ======
+
+Python client for [PubSubSQL](http://pubsubsql.com/) in-memory database.
+
 * Python client and samples for PubSubSQL
+* Tested with: Python 2.X
 
-* Tested with: Python 2.7.10
-
-installation
+Installation
 ============
 
 ```shell
