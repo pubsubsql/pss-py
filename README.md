@@ -11,7 +11,7 @@ Installation
 
 You can install the client using pip
 ```shell
-$ sudo pip install redis
+$ sudo pip install pubsubsql
 ```
 
 Or you can directly install from repository:
