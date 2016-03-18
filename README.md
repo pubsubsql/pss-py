@@ -9,6 +9,12 @@ Python client for [PubSubSQL](http://pubsubsql.com/) in-memory database.
 Installation
 ============
 
+You can install the client using pip
+```shell
+$ sudo pip install redis
+```
+
+Or you can directly install from repository:
 ```shell
 $ sudo python setup.py install
 ```

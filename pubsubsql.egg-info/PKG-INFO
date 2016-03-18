@@ -6,11 +6,20 @@ Home-page: http://github.com/pubsubsql/pss-py
 Author: Oleg Rabaev
 Author-email: info@pubsubsql.com
 License: Apache2.0
-Description: python
+Description: pss-py
         ======
-        * Python client and samples for PubSubSQL
         
-        * Tested with: Python 2.7.10
+        Python client for [PubSubSQL](http://pubsubsql.com/) in-memory database.
+        
+        * Python client and samples for PubSubSQL
+        * Tested with: Python 2.X
+        
+        Installation
+        ============
+        
+        ```shell
+        $ sudo python setup.py install
+        ```
         
 Keywords: PubSubSQL,database
 Platform: UNKNOWN
